@@ -1,24 +1,34 @@
+# rsync: резервное копирование
 
-Kопирование файлов из папки источника(source) в папку назначения(destination)
-Обязательно ставить / после каталока источника
+`source/` копирует **содержимое** каталога. Без завершающего `/` копируется сам каталог. Регистр в путях важен: `Data` и `data` — разные имена.
 
-Параметр n -это проверка
+## Сначала проверка
 
+```bash
+# -a: атрибуты и рекурсия, -v: подробности, -n: без записи
+rsync -avn /mnt/Data/Foto/ /mnt/Elements/Foto/
+```
 
-Копирование файлов на WD Elements из /mnt/data (DOC,Foto,Video)
+Убедитесь, что накопитель смонтирован: `findmnt /mnt/Elements`. Иначе файлы могут попасть на системный диск.
 
+## WD Elements
 
-`rsync -av /mnt/Data/Foto/ /mnt/Elements/Foto`
-`rsync -av /mnt/Data/Video/ /mnt/Elements/Video`
-`rsync -av /mnt/Data/DOC/ /mnt/Elements/DOC`
-`rsync -av /mnt/Data/Курсы/ /mnt/Elements/Курсы`
-`rsync -av /mnt/Data/Julia/ /mnt/Elements/Julia`
+```bash
+rsync -av /mnt/Data/Foto/ /mnt/Elements/Foto/
+rsync -av /mnt/Data/Video/ /mnt/Elements/Video/
+rsync -av /mnt/Data/DOC/ /mnt/Elements/DOC/
+rsync -av /mnt/Data/Курсы/ /mnt/Elements/Курсы/
+rsync -av /mnt/Data/Julia/ /mnt/Elements/Julia/
+```
 
-Копирование файлов на Orico из /mnt/data (DOC,Foto,Video)
+## Orico
 
-`rsync -av /mnt/Data/Foto/ /mnt/Orico/Foto`
-`rsync -av /mnt/Data/Video/ /mnt/Orico/Video`
-`rsync -av /mnt/Data/DOC/ /mnt/Orico/DOC`
-`rsync -av /mnt/Data/Курсы/ /mnt/Orico/Курсы`
-`rsync -av /mnt/Data/Julia/ /mnt/Orico/Julia`
-`rsync -av /mnt/Data/Julia/ /mnt/Orico/Julia
+```bash
+rsync -av /mnt/Data/Foto/ /mnt/Orico/Foto/
+rsync -av /mnt/Data/Video/ /mnt/Orico/Video/
+rsync -av /mnt/Data/DOC/ /mnt/Orico/DOC/
+rsync -av /mnt/Data/Курсы/ /mnt/Orico/Курсы/
+rsync -av /mnt/Data/Julia/ /mnt/Orico/Julia/
+```
+
+Перед копированием проверьте `findmnt /mnt/Orico`. Эти команды не удаляют лишние файлы в назначении; `--delete` добавляйте только после dry run.

@@ -1,24 +1,33 @@
-Краткая инструкция о том, как избавиться от назойливого cloud-init в Ubuntu Server, который постоянно напоминает о себе в консоли в виде ненужных и бесполезных сообщений и неслабо тормозит систему.
+# Ubuntu: отключение cloud-init
 
-Открываем файл /etc/cloud/cloud.cfg.d/90_dpkg.cfg
+Отключайте только после завершения первоначальной настройки. В облаке cloud-init может управлять сетью, SSH-ключами и метаданными.
 
-	sudo nano /etc/cloud/cloud.cfg.d/90_dpkg.cfg
-В нём есть строка, которая начинается с datasource_list…
+## Проверка
 
-Приведём её в такой вид:
+```bash
+cloud-init status --long
+```
 
-	datasource_list: [ None ]
-Затем переконфигурируем пакет cloud-init
+Сначала проверьте, не зависит ли сеть от сгенерированных файлов в `/etc/netplan/`.
 
-	sudo dpkg-reconfigure cloud-init
-и избавляемся от него
+## Отключение без удаления
 
-	sudo apt purge cloud-init
-Теперь удалим 2 директории: /etc/cloud/ и /var/lib/cloud/
+```bash
+sudo touch /etc/cloud/cloud-init.disabled
+sudo reboot
+```
 
-	sudo rm -rf /etc/cloud/
-	sudo rm -rf /var/lib/cloud/
-Перезапускаем систему
+## Возврат
 
-	sudo shutdown -r now
-и видим, что сообщений от cloud-init больше нет.
+```bash
+sudo rm /etc/cloud/cloud-init.disabled
+sudo reboot
+```
+
+## Удаление — необязательно
+
+```bash
+sudo apt purge cloud-init
+```
+
+Проверьте список удаляемых пакетов. Не удаляйте `/etc/cloud` и `/var/lib/cloud` вручную без резервной копии: там сохраняются настройки и состояние.

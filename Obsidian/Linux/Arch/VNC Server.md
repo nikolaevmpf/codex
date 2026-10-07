@@ -1,20 +1,49 @@
-sudo pacman -S tigervnc
+# TigerVNC на Arch Linux
+
+Отдельный удалённый рабочий стол X11. Сессия GNOME Wayland для этого примера не подходит.
+
+## Пользователь
+
+```bash
+sudo pacman -S --needed tigervnc
 vncpasswd
+ls /usr/share/xsessions  # Найти доступную X11-сессию
+mkdir -p ~/.config/tigervnc
+nano ~/.config/tigervnc/config
+```
 
-Создайте файл `/home/$USERNAME/.vnc/config`с содержимым ( _замените $SESSION в соответствии с вашей установкой,_ например, _openbox_ , _plasma_ , _lxqt_ ).
+Пример конфигурации — если установлен Openbox:
 
-ls /usr/share/xsessions             # Список доступных сессий
-mkdir /home/$username/.vnc
-nano ./.vnc/config
+```ini
+session=openbox
+geometry=1280x720
+dpi=96
+localhost
+```
 
-	session=$SESSION
-	geometry=1280x720 
-	dpi=96
+`session` — имя файла из `/usr/share/xsessions` без `.desktop`. В старых версиях TigerVNC настройки лежали в `~/.vnc`; проверьте `man vncsession` для своей версии.
 
-Отредактируйте `/etc/tigervnc/vncserver.users`и добавьте, например `:4`, который в свою очередь будет соответствовать порту 5904, замените $USERNAME на имя пользователя, для которого вы только что создали пароль.
+## Служба
 
-sudo nano /etc/tigervnc/vncserver.users
+В `/etc/tigervnc/vncserver.users` добавьте имя своего пользователя:
 
-	:4=$USERNAME
-sudo systemctl enable vncserver@:4
-reboot
+```ini
+:4=username
+```
+
+```bash
+sudo systemctl enable --now vncserver@:4.service
+systemctl status vncserver@:4.service
+```
+
+Дисплей `:4` соответствует порту `5904`.
+
+## Подключение через SSH
+
+На клиенте:
+
+```bash
+ssh -N -L 5904:localhost:5904 username@server
+```
+
+VNC-клиент подключайте к `localhost:5904`. Параметр `localhost` не открывает VNC в сеть; на сервере должен работать [[ssh|SSH]].

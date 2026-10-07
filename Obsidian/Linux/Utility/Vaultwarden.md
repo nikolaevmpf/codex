@@ -1,251 +1,168 @@
-## Подготовка сервера
+# Vaultwarden: Docker + Nginx
 
-1. **Подключение к серверу**
+Пример для Arch Linux в локальной сети: `02vault.gz.local`, IP `10.2.1.151`. Замените домен и адрес своими. TLS завершает Nginx; контейнер доступен только на loopback.
+
+## Пакеты
+
 ```bash
-ssh username@10.2.1.151
-```
-
-2. **Настройка временного прокси для текущей сессии**
-```bash
-export http_proxy=http://10.2.1.252:8080
-export https_proxy=http://10.2.1.252:8080
-```
-
-3. **Обновление системы**
-```bash
-sudo pacman -Syu --noconfirm
-```
-
-## Установка необходимых пакетов
-
-1. **Установка зависимостей**
-```bash
-sudo pacman -S --noconfirm docker docker-compose nginx openssl git base-devel
-```
-
-2. **Запуск и включение Docker**
-```bash
-sudo systemctl enable --now docker
-```
-
-3. **Добавление пользователя в группу docker**
-```bash
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-## Настройка прокси для Docker
-
-1. **Создание директории конфигурации Docker**
-```bash
-sudo mkdir -p /etc/systemd/system/docker.service.d
-```
-
-2. **Создание файла конфигурации прокси**
-```bash
-sudo tee /etc/systemd/system/docker.service.d/proxy.conf > /dev/null <<EOL
-[Service]
-Environment="HTTP_PROXY=http://10.2.1.252:8080"
-Environment="HTTPS_PROXY=http://10.2.1.252:8080"
-EOL
-```
-
-3. **Применение изменений**
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-```
-
-## Создание самоподписанного SSL-сертификата
-
-1. **Создание директории для сертификатов**
-```bash
-sudo mkdir -p /etc/ssl/certs/02vault
-cd /etc/ssl/certs/02vault
-```
-
-2. **Генерация ключа и сертификата**
-```bash
-sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
--keyout /etc/ssl/certs/02vault/02vault.key \
--out /etc/ssl/certs/02vault/02vault.crt \
--subj "/CN=02vault.gz.local/O=02vault/C=RU" \
--addext "subjectAltName=DNS:02vault.gz.local,IP:10.2.1.151"
-```
-
-3. **Установка прав доступа**
-```bash
-sudo chmod 600 /etc/ssl/certs/02vault/*
-```
-
-## Установка и настройка Vaultwarden
-
-1. **Создание рабочей директории**
-```bash
-sudo mkdir -p /opt/vaultwarden/{data,config}
+sudo pacman -Syu
+sudo pacman -S --needed docker docker-compose nginx openssl
+sudo systemctl enable --now docker.service
+sudo install -d -m 700 /opt/vaultwarden
 cd /opt/vaultwarden
 ```
 
-2. **Создание docker-compose.yml**
-```bash
-sudo tee docker-compose.yml > /dev/null <<EOL
-version: '3'
+Команды Docker ниже выполняются через sudo. Группа `docker` даёт права, сопоставимые с root; добавление в неё необязательно.
 
+## Прокси Docker — если требуется
+
+Файл `/etc/systemd/system/docker.service.d/proxy.conf`:
+
+```ini
+[Service]
+Environment="HTTP_PROXY=http://10.2.1.252:8080/"
+Environment="HTTPS_PROXY=http://10.2.1.252:8080/"
+Environment="NO_PROXY=localhost,127.0.0.1,.gz.local"
+```
+
+```bash
+sudo mkdir -p /etc/systemd/system/docker.service.d
+# После создания файла
+sudo systemctl daemon-reload
+sudo systemctl restart docker.service
+```
+
+## Compose
+
+Создайте `/opt/vaultwarden/compose.yaml`. Замените `VERSION` проверенной версией образа; не обновляйте хранилище паролей вслепую.
+
+```yaml
 services:
   vaultwarden:
-    image: vaultwarden/server:latest
+    image: vaultwarden/server:VERSION
     container_name: vaultwarden
-    restart: always
+    restart: unless-stopped
     environment:
-      - WEBSOCKET_ENABLED=true
-      - SIGNUPS_ALLOWED=false
-      - DOMAIN=https://02vault.gz.local
-      - LOG_FILE=/data/vaultwarden.log
-      - LOG_LEVEL=warn
-      - ADMIN_TOKEN=$(openssl rand -base64 48)
-      - ROCKET_TLS={certs="/ssl/02vault.crt",key="/ssl/02vault.key"}
+      DOMAIN: "https://02vault.gz.local"
+      SIGNUPS_ALLOWED: "false"
+      LOG_LEVEL: "warn"
     volumes:
       - ./data:/data
-      - /etc/ssl/certs/02vault:/ssl
     ports:
-      - "8000:80"
-      - "3012:3012"
-    networks:
-      - vaultwarden_net
-
-networks:
-  vaultwarden_net:
-    driver: bridge
-EOL
+      - "127.0.0.1:8000:80"
 ```
 
-3. **Запуск Vaultwarden**
+Современный Vaultwarden обслуживает WebSocket на основном порту; отдельный `3012` и `WEBSOCKET_ENABLED` не нужны. `ADMIN_TOKEN` не задан: административная панель отключена.
+
 ```bash
-sudo docker-compose up -d
+cd /opt/vaultwarden
+sudo docker compose config --quiet
+sudo docker compose up -d
 ```
 
-## Настройка Nginx в качестве обратного прокси
+## TLS для локальной сети
 
-1. **Создание конфигурации Nginx**
+Самоподписанный сертификат нужно доверенно установить на клиентах; для публичного домена используйте доверенный CA.
+
 ```bash
-sudo tee /etc/nginx/conf.d/vaultwarden.conf > /dev/null <<EOL
+sudo install -d -m 700 /etc/ssl/vaultwarden
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout /etc/ssl/vaultwarden/server.key \
+  -out /etc/ssl/vaultwarden/server.crt \
+  -subj '/CN=02vault.gz.local' \
+  -addext 'subjectAltName=DNS:02vault.gz.local,IP:10.2.1.151'
+sudo chmod 600 /etc/ssl/vaultwarden/server.key
+```
+
+## Nginx
+
+Создайте `/etc/nginx/conf.d/vaultwarden.conf`. Убедитесь, что в секции `http` файла `/etc/nginx/nginx.conf` есть `include /etc/nginx/conf.d/*.conf;`.
+
+```nginx
 server {
     listen 80;
     server_name 02vault.gz.local;
-    return 301 https://\$host\$request_uri;
+    return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl;
     server_name 02vault.gz.local;
-
-    ssl_certificate /etc/ssl/certs/02vault/02vault.crt;
-    ssl_certificate_key /etc/ssl/certs/02vault/02vault.key;
-
+    ssl_certificate /etc/ssl/vaultwarden/server.crt;
+    ssl_certificate_key /etc/ssl/vaultwarden/server.key;
     ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-
     client_max_body_size 128M;
 
     location / {
         proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-
-    location /notifications/hub {
-        proxy_pass http://127.0.0.1:3012;
-        proxy_set_header Upgrade \$http_upgrade;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
     }
-
-    location /notifications/hub/negotiate {
-        proxy_pass http://127.0.0.1:8000;
-    }
 }
-EOL
 ```
 
-2. **Проверка и перезапуск Nginx**
 ```bash
 sudo nginx -t
-sudo systemctl enable --now nginx
-sudo systemctl restart nginx
+sudo systemctl enable --now nginx.service
+sudo systemctl reload nginx.service
 ```
 
-## Настройка локального DNS (если нужно)
+На клиентах настройте DNS или запись в hosts:
 
-1. **На клиентских машинах добавить в /etc/hosts**
-```
+```text
 10.2.1.151 02vault.gz.local
 ```
 
-## Настройка фаервола
+Разрешите TCP 80/443 из нужной сети в используемом межсетевом экране. Пример UFW:
 
-1. **Разрешение необходимых портов**
 ```bash
-sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-sudo iptables-save | sudo tee /etc/iptables/iptables.rules
-sudo systemctl enable --now iptables
+sudo ufw allow from 10.2.1.0/24 to any port 80 proto tcp
+sudo ufw allow from 10.2.1.0/24 to any port 443 proto tcp
 ```
 
-## Проверка установки
+## Первый пользователь
 
-1. **Проверка работы контейнера**
+Регистрация отключена. Для первого аккаунта временно установите `SIGNUPS_ALLOWED: "true"`, примените Compose и создайте аккаунт в доверенной сети. Сразу верните `"false"` и снова примените:
+
 ```bash
-sudo docker ps
-```
-
-2. **Проверка логов**
-```bash
-sudo docker logs vaultwarden
-```
-
-3. **Доступ к веб-интерфейсу**
-Откройте в браузере: `https://02vault.gz.local`
-
-4. **Доступ к админ-панели**
-`https://02vault.gz.local/admin` с использованием токена из docker-compose.yml
-
-## Дополнительные настройки
-
-1. **Постоянные настройки прокси**
-```bash
-sudo tee -a /etc/environment > /dev/null <<EOL
-http_proxy="http://10.2.1.252:8080"
-https_proxy="http://10.2.1.252:8080"
-no_proxy="localhost,127.0.0.1,10.2.1.151"
-EOL
-```
-
-2. **Автоматическое обновление**
-Создайте скрипт `/opt/vaultwarden/update.sh`:
-```bash
-#!/bin/bash
 cd /opt/vaultwarden
-docker-compose pull
-docker-compose up -d
-docker image prune -f
+sudo docker compose up -d
 ```
-Сделайте исполняемым:
+
+## Проверка
+
 ```bash
-sudo chmod +x /opt/vaultwarden/update.sh
+sudo docker compose ps
+sudo docker compose logs --tail=50 vaultwarden
+curl -I http://127.0.0.1:8000/
 ```
 
-3. **Добавление в cron для автоматического обновления**
+Откройте `https://02vault.gz.local` с доверенным сертификатом, проверьте вход и сохранение тестовой записи.
+
+## Резервная копия и обновление
+
+Сначала сохраните каталог `data`, Compose и TLS-ключи в защищённое хранилище. Для согласованной копии остановите контейнер на время копирования:
+
 ```bash
-(crontab -l 2>/dev/null; echo "0 3 * * * /opt/vaultwarden/update.sh >> /var/log/vaultwarden-update.log 2>&1") | crontab -
+cd /opt/vaultwarden
+sudo docker compose stop
+# Выполнить резервное копирование data и конфигурации
+sudo docker compose start
 ```
 
-## Важные заметки
+После резервной копии измените версию образа в `compose.yaml`:
 
-1. Для доступа к сервису с других устройств в сети:
-   - Добавьте запись `02vault.gz.local` с IP `10.2.1.151` в DNS-сервер сети
-   - Или добавьте эту запись в файл hosts на каждом клиентском устройстве
+```bash
+sudo docker compose pull
+sudo docker compose up -d
+sudo docker compose logs --tail=50 vaultwarden
+```
 
-2. При первом посещении браузер будет предупреждать о самоподписанном сертификате - это нормально.
+Автоматическое обновление без проверки и резервной копии не настраивайте.
 
-3. Для промышленного использования рекомендуется использовать сертификаты от Let's Encrypt.
+[Документация Vaultwarden](https://github.com/dani-garcia/vaultwarden/wiki)

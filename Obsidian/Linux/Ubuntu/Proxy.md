@@ -1,49 +1,62 @@
-sudo nano /etc/environment
+# Ubuntu: прокси
 
-	export http_proxy="10.2.1.252:8080"
-	export https_proxy="10.2.1.252:8080"
-	export no_proxy="localhost,127.0.0.1,::1"
+Пример адреса: `http://10.2.1.252:8080/`. Замените его своим. HTTP-прокси может обслуживать HTTPS через CONNECT — это не требует схемы `https://` в адресе прокси.
 
-##  Apt
-sudo nano /etc/apt/apt.conf
+## Текущая сессия Bash
 
-	Acquire::http::Proxy "http://10.2.1.252:8080/";
-	Acquire::https::Proxy "https://10.2.1.252:8080/";
+Добавьте функции один раз в `~/.bashrc`:
+
+```bash
+setproxy() {
+  export http_proxy="http://10.2.1.252:8080/"
+  export https_proxy="$http_proxy"
+  export ftp_proxy="$http_proxy"
+  export no_proxy="localhost,127.0.0.1,::1,.gz.local"
+  export HTTP_PROXY="$http_proxy" HTTPS_PROXY="$https_proxy"
+  export FTP_PROXY="$ftp_proxy" NO_PROXY="$no_proxy"
+}
+unsetproxy() {
+  unset http_proxy https_proxy ftp_proxy no_proxy
+  unset HTTP_PROXY HTTPS_PROXY FTP_PROXY NO_PROXY
+}
+```
+
+```bash
+source ~/.bashrc
+setproxy    # Включить
+unsetproxy  # Отключить
+```
+
+## Постоянные переменные
+
+В `/etc/environment` используйте пары `имя=значение`, **без `export`**:
+
+```ini
+http_proxy="http://10.2.1.252:8080/"
+https_proxy="http://10.2.1.252:8080/"
+no_proxy="localhost,127.0.0.1,::1,.gz.local"
+```
+
+Применяются при новом входе. Системным службам могут потребоваться отдельные настройки прокси.
+
+## APT
+
+Файл `/etc/apt/apt.conf.d/80proxy`:
+
+```text
+Acquire::http::Proxy "http://10.2.1.252:8080/";
+Acquire::https::Proxy "http://10.2.1.252:8080/";
+```
 
 ## Wget
-sudo nano /etc/wgetrc      (для всех)
-sudo nano ~/.wgetrc        (для пользователя)
 
-	use_proxy = on
-	http_proxy = http://10.2.1.252:8080
-	https_proxy = http://10.2.1.252:8080
-	ftp_proxy = http://10.2.1.252:8080
+Файл `~/.wgetrc` для пользователя или `/etc/wgetrc` для системы:
 
+```ini
+use_proxy = on
+http_proxy = http://10.2.1.252:8080/
+https_proxy = http://10.2.1.252:8080/
+ftp_proxy = http://10.2.1.252:8080/
+```
 
-** Если прокси-сервер требует аутентификации, добавьте [username]:[password]@ перед адресом прокси-сервера.
-
----
-Можно также создать функции Bash для автоматической настройки proxy. Для этого добавить в файл ~/.bashrc следующий код:
-
-	#Включить Proxy
-	
-	function setproxy()	 {
-	    
-	    export http_proxy="http://10.2.1.252:8080"
-	    export https_proxy="https://10.2.1.252:8080"
-	    export ftp_proxy="ftp://10.2.1.252:8080"
-	
-	}
-	
-	#Отключить Proxy
-	
-	function unsetproxy() {
-	
-	   unset {http,https,ftp}_proxy
-	}
-
-И применить сделанные настройки:
-
-source ~/.bashrc
-
-Теперь для быстрого включения и отключения прокси можно использовать команды **setproxy** и **unsetproxy**.
+Не сохраняйте логины и пароли прокси в общей заметке. Для отключения удалите только добавленные параметры из соответствующих файлов.

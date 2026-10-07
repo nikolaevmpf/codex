@@ -1,77 +1,95 @@
-UBUNTU 24.04
+# Ubuntu 24.04: после установки
 
-# Обновление
+Выбирайте нужные программы; устанавливать всё сразу необязательно. Сеть и драйверы: [[Linux/Ubuntu/Install|Базовая настройка]].
 
-	sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove 
+## Обновление
 
-# Удаление ненужных программ
+```bash
+sudo apt update
+sudo apt full-upgrade
+sudo apt autoremove  # Проверить список перед подтверждением
+```
 
-	sudo snap remove firefox thunderbird
+## Программы из APT и Snap
 
-# Установка Chrome
+```bash
+sudo apt install gnome-tweaks timeshift ncdu inxi nmap htop mc tcpdump \
+  gnome-browser-connector gnome-shell-extensions dconf-editor \
+  kdenlive shotcut mpv heif-gdk-pixbuf
+sudo snap install telegram-desktop
+sudo snap install obsidian --classic
+```
 
-	wget https://dl.google.com/linux/direct/google-chrome-table_current_amd64.deb && sudo dpkg -i --force-depends google-chrome-stable_current_amd64.deb && sudo rm google-chrome-stable_current_amd64.deb
+Steam доступен также через Flatpak. Для `heif-gdk-pixbuf` может потребоваться репозиторий universe.
 
-# Установка программ
+## Chrome — пакет DEB
 
-	sudo apt install -y gnome-tweaks timeshift ncdu inxi neofetch nmap htop mc tcpdump chrome-gnome-shell gnome-shell-extensions dconf-editor steam
-	sudo snap install telegram-desktop
-	sudo snap install obsidian --classic
+Для x86_64; альтернатива — Flatpak ниже.
 
-# поддержка формата .heic
+```bash
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb
+rm google-chrome-stable_current_amd64.deb
+```
 
-	sudo apt -y install heif-gdk-pixbuf
+`apt install ./...` устанавливает зависимости; `--force-depends` не нужен.
 
-# Добавим alias
+## Flatpak — альтернативный источник
 
-	sudo echo "alias upd='sudo apt update && sudo apt -y dist-upgrade && sudo apt autoremove && sudo snap refresh'" >> ~/.bashrc
-
-# Минимизация окна по иконки
-
-	gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize'
-
-	sudo shutdown -r now
-
-
-
-
-
-
-
-
-Dash to Dock
-Gradient top bar
-Hide top bar
-User themes
-ddTerm
-
-sudo systemctl stop snapd
-sudo apt remove --purge --assume-yes snapd
-sudo rm -rf ~/snap/
-
-Установка программ
-sudo apt install -y flatpak
-sudo apt install -y gnome-software-plugin-flatpak
+```bash
+sudo apt install flatpak gnome-software-plugin-flatpak
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+```
 
-sudo flatpak install -y flathub ca.desrt.dconf-editor 
-sudo flatpak install -y flathub org.telegram.desktop
-sudo flatpak install -y flathub com.valvesoftware.Steam
-sudo flatpak install -y flathub com.transmissionbt.Transmission
-sudo flatpak install -y flathub org.remmina.Remmina
-sudo flatpak install -y flathub org.gnome.Boxes # Нет снимков и проброса USB
-sudo flatpak install -y flathub com.google.Chrome
-sudo flatpak install -y flathub io.mpv.Mpv
-sudo flatpak install -y flathub org.kde.kdenlive
-sudo flatpak install -y flathub org.shotcut.Shotcut
+Выберите приложения из списка:
 
+```bash
+flatpak install flathub ca.desrt.dconf-editor org.telegram.desktop \
+  com.valvesoftware.Steam com.transmissionbt.Transmission org.remmina.Remmina \
+  org.gnome.Boxes com.google.Chrome io.mpv.Mpv org.kde.kdenlive org.shotcut.Shotcut
+```
 
-Установка VMware Workstation
-wget https://download3.vmware.com/software/WKST-1623-LX-New/VMware-Workstation-Full-16.2.3-19376536.x86_64.bundle
-sudo chmod +x VMware-Workstation-.bundle
-sudo ./VMware-Workstation-.bundle
-sudo echo "mks.gl.allowBlacklistedDrivers = "TRUE"" >> ~/.vmware/preferences
+GNOME Boxes подходит для простых ВМ; для расширенных настроек используйте virt-manager. Не ставьте одновременно несколько вариантов одной программы без необходимости.
 
+## GNOME
 
-Установка VPN anyconnect
-sudo apt install -y network-manager-openvpn network-manager-openconnect-gnome 
+Расширения: Dash to Dock, Gradient Top Bar, Hide Top Bar, User Themes, ddterm. Проверьте совместимость с версией GNOME.
+
+```bash
+# Только если доступна схема Ubuntu Dock / Dash to Dock
+gsettings set org.gnome.shell.extensions.dash-to-dock click-action 'minimize'
+```
+
+В `~/.bashrc` добавьте один раз:
+
+```bash
+alias upd='sudo apt update && sudo apt full-upgrade && sudo snap refresh'
+```
+
+## Snap — удаление только при необходимости
+
+```bash
+snap list
+# Пример удаления ненужных приложений
+sudo snap remove firefox thunderbird
+```
+
+Удаление всего Snap несовместимо с установкой Telegram и Obsidian через Snap выше. Сначала перенесите данные и выберите альтернативы; каталог `~/snap` автоматически не удаляйте.
+
+## VMware Workstation
+
+Скачайте актуальный `.bundle` с официального портала Broadcom. Не используйте старую ссылку на Workstation 16.
+
+```bash
+# Заменить имя файла скачанным
+chmod +x VMware-Workstation-VERSION.x86_64.bundle
+sudo ./VMware-Workstation-VERSION.x86_64.bundle
+```
+
+## VPN
+
+```bash
+sudo apt install network-manager-openvpn-gnome network-manager-openconnect-gnome
+```
+
+OpenConnect подходит для совместимых серверов Cisco AnyConnect. Профиль создайте в настройках сети.

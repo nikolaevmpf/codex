@@ -1,12 +1,59 @@
-sudo pacman -S ufw
+# UFW: межсетевой экран
 
-sudo ufw default deny
-sudo ufw allow from 192.168.0.0/24
-sudo ufw allow Deluge
-sudo ufw limit ssh
+## Установка
 
+Arch Linux:
+
+```bash
+sudo pacman -Syu ufw
+```
+
+Ubuntu / Debian:
+
+```bash
+sudo apt install ufw
+```
+
+## Базовые правила
+
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# До включения UFW, если нужен SSH на стандартном порту
+sudo ufw limit 22/tcp
 sudo ufw enable
+```
 
-sudo ufw status
+При нестандартном порте SSH замените `22`. Для удалённой настройки сначала разрешите доступ, иначе соединение может оборваться.
 
-sudo ufw delete allow Deluge
+На Arch включите службу:
+
+```bash
+sudo systemctl enable --now ufw.service
+```
+
+## Дополнительные правила
+
+```bash
+# SSH только из своей подсети — альтернатива открытому правилу выше
+sudo ufw allow from 192.168.0.0/24 to any port 22 proto tcp
+
+# Профили приложений: использовать только существующие
+sudo ufw app list
+# sudo ufw allow Deluge
+# sudo ufw delete allow Deluge
+```
+
+Не разрешайте всю подсеть ко всем портам без необходимости. Правила суммируются: для ограничения SSH подсетью удалите прежнее общее правило.
+
+## Проверка и удаление
+
+```bash
+sudo ufw status verbose
+sudo ufw status numbered
+# Удалить выбранное правило по актуальному номеру
+sudo ufw delete 1
+```
+
+После удаления номера правил меняются.

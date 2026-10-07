@@ -1,159 +1,93 @@
-### NETWORK
-nmtui
+# Ubuntu: базовая настройка
 
-sudo nano /etc/netplan/02-network.yaml
+Примеры для Ubuntu 24.04. Адреса, интерфейсы и домен замените своими. Приложения: [[After install]], прокси: [[Proxy]], мониторинг: [[Zabbix]].
 
-	network:
-	  ethernets:
-	    ens160:
-	      addresses:
-	      - 10.2.1.150/24
-	      nameservers:
-	        addresses:
-	        - 10.2.1.11
-	        - 10.2.1.218
-	        search:
-	        - gz.local
-	      routes:
-	      - to: default
-	        via: 10.2.1.1
-	  version: 2
+## Сеть через Netplan
 
-PROXY SYSTEM
+Сначала проверьте существующие файлы в `/etc/netplan/`, чтобы не задать интерфейс дважды. В GNOME можно использовать NetworkManager и `nmtui`.
 
-sudo nano  /etc/profile.d/proxy.sh
+Пример для Ubuntu Server, `/etc/netplan/02-network.yaml`:
 
-	export http_proxy="http://10.2.1.252:8080/"
-	export https_proxy="http://10.2.1.252:8080/"
-	export ftp_proxy="http://10.2.1.252:8080/"
-	export no_proxy="127.0.0.1,localhost"
-	export HTTP_PROXY="http://10.2.1.252:8080/"
-	export HTTPS_PROXY="http://10.2.1.252:8080/"
-	export FTP_PROXY="http://10.2.1.252:8080/"
-	export NO_PROXY="127.0.0.1,localhost"
+```yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens160:
+      dhcp4: false
+      addresses: [10.2.1.150/24]
+      nameservers:
+        addresses: [10.2.1.11, 10.2.1.218]
+        search: [gz.local]
+      routes:
+        - to: default
+          via: 10.2.1.1
+```
 
-sudo chmod +x  /etc/profile.d/proxy.sh
-source /etc/profile.d/proxy.sh
-env | grep -i proxy
+```bash
+sudo chmod 600 /etc/netplan/02-network.yaml
+sudo netplan generate
+sudo netplan try  # Временное применение с подтверждением
+```
 
-### APT
+Изменение сети может оборвать SSH; держите доступ к консоли.
 
-sudo nano /etc/apt/apt.conf.d/80proxy
+## Обновление и SSH
 
-	Acquire::http::proxy "http://10.2.1.252:8080/";
-	Acquire::https::proxy "http://10.2.1.252:8080/";
-	Acquire::ftp::proxy "ftp://10.2.1.252:8080/";
-
-### WGET
-
-sudo nano /etc/wgetrc
-
-	use_proxy = on
-	http_proxy = http://10.2.1.252:8080 
-	https_proxy = http://10.2.1.252:8080
-	ftp_proxy = http://10.2.1.252:8080
-
-### SSH Server
-
-sudo apt install openssh-server
-sudo systemctl enable sshd
-
-### UPDATE
-
-sudo apt update 
-sudo apt upgrade
-sudo apt autoremove
-sudo apt update && sudo apt upgrade -y
-
-Добавление alias:
-echo "alias upd=’sudo apt update && sudo apt full-upgrade’" >> ~/.bashrc
-
-### REBOOT
-
-sudo systemctl reboot
-sudo systemctl poweroff
-sudo systemctl restart networking
-
-### VIDEO
-
-NVIDIA
-
-sudo apt install nvidia-driver
-
-AMD
-
-sudo apt install fglrx-driver
-
-### AUDIO
-
-Артефакты звука
-sudo nano /etc/pulse/default.pa
-
-Изменить строку
-load-module module-udev-detect
-
-на 
-
-load-module module-udev-detect tsched=0
-
-Перезапуск
-
-pulseaudio -k && pulseaudio --start
-
-### VMWARE
-
-sudo apt install open-vm-tools
-
-COMMAND
-
-ip a - сетевые настройки
-blkid - просмотр файловых систем
-lsblk - просмотр дисков
-
-### INSTALL
-
-sudo apt install kdenlive - видеоредактор
-sudo apt install shotcut - видеоредактор
-sudo apt install mpv - видеопроигрыватель
-sudo apt install dconf-editor - редактор настроек
-sudo apt install gnome-tweak-tool
-sudo apt install timeshift
-
-wget [https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb](https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb)
-sudo dpkg -i --force-depends google-chrome-stable_current_amd64.deb
-
-sudo apt install cdpr - обнаружение устройств ( использование протокола cdp)
-cdpr -d eth1
-
-sudo apt-get install ncdu - подсчет занимаемого места
-
-ncdu /
-
-sudo apt install inxi - информация об оборудовании 
-
-inxi -Fxs
-
-Расширения
-
-Dash to Dock
-Gradient top bar
-Hide top bar
-User themes
-
-Zabbix agent
-
+```bash
 sudo apt update
-sudo apt -y install zabbix-agent
+sudo apt full-upgrade
+sudo apt install openssh-server
+sudo systemctl enable --now ssh.service
+```
 
-sudo sed -i 's/Server=127.0.0.1/# Server=127.0.0.1/g' /etc/zabbix/zabbix_agentd.conf && sudo sed -i 's/# StartAgents=3/StartAgents=0/g' /etc/zabbix/zabbix_agentd.conf && sudo sed -i 's/ServerActive=127.0.0.1/ServerActive=10.2.1.60/g' /etc/zabbix/zabbix_agentd.conf && sudo sed -i 's/# HostnameItem=system.hostname/HostnameItem=system.hostname/g' /etc/zabbix/zabbix_agentd.conf && sudo sed -i 's/# HostMetadataItem=/HostMetadataItem=system.uname/g' /etc/zabbix/zabbix_agentd.conf
+Настройка ключей: [[ssh]]. Перед включением UFW разрешите порт SSH: [[ufw]].
 
-sudo service zabbix-agent restart
-sudo service zabbix-agent status
+В `~/.bashrc` можно добавить один раз:
 
-sudo nano /etc/zabbix/zabbix_agentd.conf
+```bash
+alias upd='sudo apt update && sudo apt full-upgrade'
+```
 
-Server=127.0.0.1
-StartAgents=0
-ServerActive=10.2.1.60
-HostnameItem=system.hostname
-HostMetadataItem=system.uname
+## Видеодрайверы
+
+```bash
+ubuntu-drivers devices
+# NVIDIA: установить рекомендованный драйвер
+sudo ubuntu-drivers install
+```
+
+Для AMD обычно достаточно штатного ядра и Mesa. Старый пакет `fglrx-driver` не используйте.
+
+## Звук
+
+```bash
+systemctl --user status pipewire pipewire-pulse wireplumber
+```
+
+Ubuntu 24.04 Desktop использует PipeWire. Правку `tsched=0` в `/etc/pulse/default.pa` рассматривайте только для старых систем с PulseAudio, после диагностики.
+
+## Гостевая VMware
+
+```bash
+sudo apt install open-vm-tools
+# Для графического рабочего стола
+sudo apt install open-vm-tools-desktop
+```
+
+## Полезные команды
+
+```bash
+ip address       # Сетевые адреса
+lsblk -f         # Диски и файловые системы
+sudo blkid       # UUID разделов
+sudo apt install ncdu inxi cdpr
+ncdu /           # Занятое место; без sudo некоторые каталоги недоступны
+inxi -F          # Оборудование
+sudo cdpr -d eth1 # Обнаружение CDP; заменить интерфейс
+```
+
+```bash
+sudo reboot      # Перезагрузка
+# sudo poweroff  # Выключение
+```

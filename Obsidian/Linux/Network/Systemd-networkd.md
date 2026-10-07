@@ -1,29 +1,57 @@
-systemctl enable systemd-networkd.service 
-systemctl enable systemd-resolved.service 
+# Сеть: systemd-networkd
 
-## Static
-nano /etc/systemd/network/20-wired.network
+Примеры для интерфейса `enp2s1`; замените имя и адреса своими. Для одного интерфейса используйте один сетевой менеджер.
 
-	[Match]
-	Name = enp2s1
-	[Network]
-	Address = 10.2.1.111/24
-	Gateway = 10.2.1.1
-	LinkLocalAddressing = no  # отключить ipv6
-	IPv6AcceptRA = no  # отключить ipv6
+## Статический адрес
 
-nano /etc/systemd/resolved.conf
+Создайте `/etc/systemd/network/20-wired.network`:
 
-	[resolve]
-	DNS = 10.2.1.11
-	DNS = 10.2.1.218
-	Domains = gz.local
+```ini
+[Match]
+Name=enp2s1
 
-## DHCP
-nano /etc/systemd/network/20-wired.network
+[Network]
+Address=10.2.1.111/24
+Gateway=10.2.1.1
+DNS=10.2.1.11
+DNS=10.2.1.218
+Domains=gz.local
+LinkLocalAddressing=no
+IPv6AcceptRA=no
+```
 
-	[Match]
-	Name = enp2s1
-	[Network]
-	DHCP = yes
----
+Последние две строки отключают link-local и получение IPv6 router advertisements для этого интерфейса, а не весь IPv6 в ядре.
+
+## DHCP — вместо статического блока
+
+Для того же файла:
+
+```ini
+[Match]
+Name=enp2s1
+
+[Network]
+DHCP=yes
+```
+
+## DNS и запуск
+
+```bash
+sudo systemctl enable --now systemd-networkd.service systemd-resolved.service
+# Сначала проверить и сохранить существующий /etc/resolv.conf
+sudo ln -sfn /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+sudo networkctl reload
+sudo networkctl reconfigure enp2s1
+```
+
+Если нужен глобальный DNS, используйте секцию `[Resolve]` в `/etc/systemd/resolved.conf`; обычно DNS из `.network` достаточно.
+
+## Проверка
+
+```bash
+networkctl status enp2s1
+resolvectl status
+ip route
+```
+
+При переходе с другого менеджера см. [[Netplan]]. Применение настроек может оборвать SSH.

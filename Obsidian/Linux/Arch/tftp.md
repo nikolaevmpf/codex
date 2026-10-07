@@ -1,18 +1,46 @@
-sudo pacman -S tftpd-hpa
+# TFTP на Arch Linux
 
+TFTP не использует аутентификацию и шифрование. Пример — для выдачи файлов в доверенной локальной сети.
+
+## Установка
+
+```bash
+sudo pacman -S --needed tftpd-hpa
+sudo install -d -m 755 /srv/tftp
 sudo nano /etc/conf.d/tftpd
+```
 
-	TFTPD_ARGS="--secure -4 /srv/tftp"
-	TFTPD_USER="nobody"
-	TFTPD_GROUP="nobody"
+Параметры сервера:
 
-- --secure /srv/tftp: Указывает каталог, который будет использоваться для хранения файлов TFTP. В данном случае это /srv/tftp.
--  -4 указывает на использование только ipv4 (необходимо при отключении ipv6)
-- TFTPD_USER и TFTPD_GROUP: Указывают пользователя и группу, от имени которых будет работать сервер.
+```ini
+TFTPD_ARGS="--secure -4 /srv/tftp"
+TFTPD_USER="nobody"
+TFTPD_GROUP="nobody"
+```
 
-sudo mkdir -p /srv/tftp
-sudo chown -R nobody:nobody /srv/tftp
-sudo chmod -R 777 /srv/tftp  # Разрешите чтение и запись для всех (для тестирования)
+`--secure` ограничивает каталог, `-4` включает только IPv4. Проверьте, что группа `nobody` существует: `getent group nobody`.
 
-sudo systemctl start tftpd
-sudo systemctl enable tftpd
+## Файлы и запуск
+
+```bash
+# Заменить путь к файлу
+sudo install -m 644 /path/to/file /srv/tftp/
+sudo systemctl enable --now tftpd.service
+systemctl status tftpd.service
+```
+
+Права `777` не нужны для скачивания. Загрузку файлов на сервер включайте отдельно и только при необходимости.
+
+Для UFW разрешите UDP 69 только своей подсети; пример:
+
+```bash
+sudo ufw allow from 192.168.1.0/24 to any port 69 proto udp
+```
+
+Проверка с клиента:
+
+```text
+tftp server-address
+tftp> get file
+tftp> quit
+```

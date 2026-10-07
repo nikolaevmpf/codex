@@ -1,26 +1,40 @@
-## Очистка кэша пакетного менеджера
+# Arch Linux: очистка
 
-	sudo pacman -Scc
-	yay -Sc
+## Кэш пакетов
 
-## Удаление неиспользуемых пакетов
+```bash
+sudo pacman -S --needed pacman-contrib
+sudo paccache -r  # Оставить три последние версии пакетов
+yay -Sc          # Просмотреть запрос перед подтверждением
+```
 
-	sudo pacman -Rns $(pacman -Qtdq)
+## Неиспользуемые зависимости
 
-## Очистка кэша браузера
+```bash
+# Сначала просмотреть список
+pacman -Qtdq
 
-	rm -rf ~/.cache/chromium
-	rm -rf ~/.cache/mozilla/firefox/*.default
+# Удалить только если список не пуст; выполнить в Bash
+mapfile -t orphans < <(pacman -Qtdq)
+if ((${#orphans[@]})); then
+  sudo pacman -Rns "${orphans[@]}"
+fi
+```
 
-## Очистка лог-файлов
+## Журналы и временные файлы
 
-	sudo truncate -s 0 /var/log/pacman.log
+```bash
+journalctl --disk-usage
+sudo journalctl --vacuum-time=14d
+sudo systemd-tmpfiles --clean
+```
 
-## Очистка директории /tmp
+Не обнуляйте `/var/log/pacman.log` и не удаляйте весь `/tmp`: они нужны для диагностики и работающих программ.
 
-	sudo rm -rf /tmp/*
+## Кэш браузера и шрифтов
 
-## Очистка кэша шрифтов
+Закройте браузер; его кэш лучше очищать через настройки, сохранив пароли и историю.
 
-	fc-cache -frv
-	sudo rm -rf ~/.cache/fontconfig/*
+```bash
+fc-cache -f  # Перестроить кэш шрифтов текущего пользователя
+```

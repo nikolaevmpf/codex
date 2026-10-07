@@ -1,80 +1,46 @@
-# Настройка беспроводной сети
+# Wi-Fi: подключение
 
-  ## Проверяем не заблокирован ли WiFi
-```
-rfkill
-```
-  
-- Если видим что что заблокирован wlan,
-  
-```
-ID TYPE      DEVICE      SOFT      HARD  
-0 bluetooth hci0   unblocked unblocked  
-1 wlan      phy0     blocked unblocked
+## Проверка блокировки
+
+```bash
+rfkill list
+sudo rfkill unblock wifi
 ```
 
-  - … то выполняем команду
+`SOFT blocked` снимается командой. При `HARD blocked` проверьте аппаратный переключатель или UEFI.
 
-```
-rfkill unblock wifi
-```
+## В live-образе Arch Linux: iwctl
 
-- Теперь все OK
-
-```
-ID TYPE      DEVICE      SOFT      HARD  
-0 bluetooth hci0   unblocked unblocked  
-1 wlan      phy0   unblocked unblocked
-```
-## Утилита `iwctl` для работы с WiFi
-
-```
+```bash
 iwctl
 ```
 
-  В самой утилите `iwctl` вводим команды:
+Внутри `iwctl` замените `wlan0` своим интерфейсом из `device list`:
 
-  - Смотрим ваши WiFi сетевые карты
-
-```
-[iwd]# device list
-```
-
-  `wlan0`
-
-   Сканируем доступные сети
-
-```
-[iwd]# station wlan0 scan
-```
-
-- Выводим список доступных сетей
-
-```
-[iwd]# station wlan0 get-networks
-```
-
-- Например получаем такое, видим там свою сеть
-
-```
-                              Available networks
---------------------------------------------------------------------------------
-  Network name                    Security          Signal
---------------------------------------------------------------------------------
-  Ace                             psk               ****
-  Nazok                           psk               ***
-  Artem                           psk               ***
-```
-- Соединяемся с нашей сетью
-```
-[iwd]# station wlan0 connect Ace
-```
-- Вводим пароль
-```
-Type the network passphrase for Ace psk.
-Passphrase: ********
-```
-- Выходим из `iwctl`
-```
+```text
+device list
+station wlan0 scan
+station wlan0 get-networks
+station wlan0 connect "Имя сети"
 exit
+```
+
+Пароль вводится в запросе программы. `iwd` должен быть запущен; само подключение требует также настройки IP и DNS.
+
+## В GNOME: NetworkManager
+
+Не запускайте независимые сетевые менеджеры для одного интерфейса.
+
+```bash
+nmcli device status
+nmcli device wifi list
+nmcli --ask device wifi connect "Имя сети"
+```
+
+## Проверка
+
+```bash
+ip address
+ip route
+ping -c 3 archlinux.org
 ```

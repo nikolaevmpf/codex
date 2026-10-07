@@ -1,94 +1,50 @@
-Установка VirtualBox на Arch Linux включает несколько шагов: установка основных пакетов, настройка ядра и добавление пользователя в группу `vboxusers`. Вот пошаговая инструкция:
+# VirtualBox на Arch Linux
 
----
+## Установка на хост
 
-### 1. **Установка VirtualBox и зависимостей**
-Откройте терминал и выполните:
-
-```bash
-sudo pacman -Syu virtualbox virtualbox-host-dkms
-```
-- `virtualbox` — основной пакет VirtualBox.
-- `virtualbox-host-dkms` — модули ядра для VirtualBox (необходимы, если вы используете нестандартное ядро).
-
-Если у вас **стандартное ядро Linux (linux)**, можно установить `virtualbox-host-modules-arch` вместо `virtualbox-host-dkms`:
+Для стандартного ядра `linux`:
 
 ```bash
 sudo pacman -Syu virtualbox virtualbox-host-modules-arch
 ```
 
----
+Для другого ядра используйте DKMS и заголовки **своего** ядра. Пример для `linux-lts`:
 
-### 2. **Установка расширений (опционально)**
-Для поддержки USB 2.0/3.0, RDP и других функций установите `virtualbox-ext-oracle` из AUR:
+```bash
+sudo pacman -Syu virtualbox virtualbox-host-dkms linux-lts-headers
+```
+
+Выберите один вариант. После обновления ядра перезагрузитесь, прежде чем загружать модули.
+
+```bash
+sudo modprobe vboxdrv
+sudo usermod -aG vboxusers "$USER"  # Доступ гостя к USB
+```
+
+Выйдите и войдите снова, затем запустите `virtualbox`.
+
+## Extension Pack — необязательно
+
+Для функций расширения проверьте условия лицензии и совпадение версии с VirtualBox:
 
 ```bash
 yay -S virtualbox-ext-oracle
 ```
-(Или используйте другой AUR-хелпер, например `paru`).
 
----
-
-### 3. **Загрузка модулей ядра**
-VirtualBox требует загрузки модуля `vboxdrv`. Выполните:
+## Проверка
 
 ```bash
-sudo modprobe vboxdrv
+lsmod | grep vbox
+dkms status  # Только для варианта с DKMS
 ```
-Чтобы модуль загружался автоматически при запуске, добавьте его в `/etc/modules-load.d/virtualbox.conf`:
+
+DKMS обычно пересобирает модули автоматически. При ошибке проверьте заголовки ядра и журнал сборки. Для NAT Network не нужно включать `systemd-networkd`.
+
+## Внутри гостевой Arch Linux
 
 ```bash
-echo "vboxdrv" | sudo tee /etc/modules-load.d/virtualbox.conf
+sudo pacman -Syu virtualbox-guest-utils
+sudo systemctl enable --now vboxservice.service
 ```
 
----
-
-### 4. **Добавление пользователя в группу `vboxusers`**
-Для доступа к USB-устройствам из виртуальных машин добавьте себя в группу `vboxusers`:
-
-```bash
-sudo usermod -aG vboxusers $USER
-```
-После этого **перезагрузите систему** или выйдите/войдите заново.
-
----
-
-### 5. **Запуск VirtualBox**
-После перезагрузки запустите VirtualBox из меню приложений или через терминал:
-
-```bash
-virtualbox
-```
-
----
-
-### 6. **Дополнительные настройки (если нужно)**
-- **Если VirtualBox не запускается**, проверьте, что модули ядра загружены:
-  ```bash
-  lsmod | grep vbox
-  ```
-  Должны быть видны `vboxdrv`, `vboxnetadp`, `vboxnetflt`.
-
-- **Для поддержки NAT Network** может потребоваться включить службу:
-  ```bash
-  sudo systemctl enable --now systemd-networkd
-  ```
-
----
-
-### **Важно!**
-- Если вы обновляете ядро, пересоберите модули VirtualBox:
-  ```bash
-  sudo dkms install vboxhost/$(pacman -Q virtualbox-host-dkms | awk '{print $2}' | sed 's/-.*//')-ARCH
-  ```
-- Для **гостевых ОС** установите `virtualbox-guest-utils` (в гостевой системе).
-
----
-
-Готово! Теперь вы можете создавать и запускать виртуальные машины в VirtualBox на Arch Linux.
-
-
-# Virtualbox tools
-	sudo pacman -S virtualbox-guest-utils
-	sudo systemctl enable vboxservice.service
-	sudo reboot
+Для гостя без графики используйте `virtualbox-guest-utils-nox` вместо графического пакета.
