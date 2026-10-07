@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Linux/NixOS/Обновление и откат.md",
+                "file": "Linux/Network/Обзор.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Обновление и откат"
+              "title": "Обзор"
             }
           }
         ]
@@ -191,19 +191,23 @@
   },
   "active": "d2ea51e85f6924f2",
   "lastOpenFiles": [
-    "Linux/NixOS/Обзор.md",
+    "Linux/Astra/Network.md",
+    "Linux/Astra/Ansible.md",
+    "Linux/Astra/Обзор.md",
+    "Linux/Astra/Активация Astra Linux.md",
+    "Linux/NixOS/Компьютеры/02i0132.md",
+    "Linux/NixOS/Компьютеры/Dell Latitude 3410.md",
     "Linux/NixOS/Обновление и откат.md",
+    "Linux/NixOS/Компьютеры/zet.md",
+    "Linux/NixOS/Обзор.md",
     "Linux/NixOS/Применение профиля.md",
     "Linux/NixOS/Установка.md",
     "Linux/NixOS/GNOME и приложения.md",
     "Linux/NixOS/Диагностика.md",
     "Linux/NixOS/История проекта.md",
-    "Linux/NixOS/Компьютеры/02i0132.md",
     "Разное/Домофон.md",
-    "Linux/NixOS/Компьютеры/zet.md",
     "Linux/NixOS/Компьютеры/vm.md",
     "Linux/NixOS/Компьютеры/nuc.md",
-    "Linux/NixOS/Компьютеры/Dell Latitude 3410.md",
     "Linux/NixOS/Компьютеры",
     "Nix/Компьютеры/zet.md",
     "Nix/Компьютеры/vm.md",
@@ -215,9 +219,6 @@
     "Nix/Обновление и откат.md",
     "Nix/Обзор.md",
     "Nix/Компьютеры",
-    "Nix/История проекта.md",
-    "Nix/Диагностика.md",
-    "Nix/GNOME и приложения.md",
     "Nix"
   ]
 }
