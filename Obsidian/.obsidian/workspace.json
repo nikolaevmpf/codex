@@ -190,5 +190,20 @@
     }
   },
   "active": "d2ea51e85f6924f2",
-  "lastOpenFiles": []
+  "lastOpenFiles": [
+    "Nix/Компьютеры/zet.md",
+    "Nix/Компьютеры/vm.md",
+    "Nix/Компьютеры/nuc.md",
+    "Nix/Компьютеры/Dell Latitude 3410.md",
+    "Nix/Компьютеры/02i0132.md",
+    "Nix/Установка.md",
+    "Nix/Применение профиля.md",
+    "Nix/Обновление и откат.md",
+    "Nix/Обзор.md",
+    "Nix/Компьютеры",
+    "Nix/История проекта.md",
+    "Nix/Диагностика.md",
+    "Nix/GNOME и приложения.md",
+    "Nix"
+  ]
 }
