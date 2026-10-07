@@ -4,6 +4,7 @@
 
 ## Оглавление
 
+- [Nix — проект NixOS и паспорта компьютеров](Obsidian/Nix/%D0%9E%D0%B1%D0%B7%D0%BE%D1%80.md)
 - [Настройка нового компьютера и синхронизация](#настройка-нового-компьютера-и-синхронизация-с-github)
 - [Главное оглавление](Obsidian/%D0%A1%D0%BE%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D0%BD%D0%B8%D0%B5.md)
 - [Linux](Obsidian/Linux/%D0%9E%D0%B1%D0%B7%D0%BE%D1%80.md)
@@ -385,6 +386,7 @@ git push origin main
 
 | Каталог | Содержание |
 | --- | --- |
+| `Obsidian/Nix/` | Наш проект NixOS: установка, GNOME, обновления и паспорта zet, nuc, 02i0132, vm, план Dell |
 | `Obsidian/Linux/Arch/` | Установка, GNOME, обслуживание, виртуализация, Wi-Fi и TFTP |
 | `Obsidian/Linux/Astra/` | Сеть, Ansible и активация |
 | `Obsidian/Linux/NixOS/` | Установка с disko и управление конфигурацией |
