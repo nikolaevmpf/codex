@@ -96,11 +96,11 @@ NVIDIA-модули этому компьютеру не нужны. Работ�
 
 ## Рабочие приложения
 
-Steam, GameMode, LibreOffice, Telegram, MAX через Flatpak, Obsidian, Pinta, Remmina, **VS Code**, Transmission, Amnezia VPN. Автовход nikolaev включён.
+Steam, GameMode, LibreOffice, Telegram, MAX через Flatpak, Obsidian, Pinta, Remmina, Transmission, Amnezia VPN. Автовход nikolaev включён.
 
 MAX устанавливает install-max.service, но обновляется отдельно через Flatpak. Импорт VPN-конфигурации выполняется пользователем. См. [[Linux/NixOS/GNOME и приложения|общую заметку]].
 
-Если загрузка VS Code с Microsoft обрывается, проверить сеть/VPN. Временное исключение пакета требует редактирования hosts/nuc/apps.nix и новой сборки, это не автоматическая часть установки.
+VS Code удалён из профиля 7 октября. Zed в профиль не включён. Личные настройки редакторов автоматически не удаляются.
 
 ## KVM
 
