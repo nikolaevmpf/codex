@@ -82,7 +82,7 @@ systemctl --user status ghostty-host-config --no-pager
 | Steam, GameMode | Нет | Да | Да | Да |
 | LibreOffice, Telegram, Obsidian, Pinta, Remmina | Нет | Нет | Да | Да |
 | Transmission | Нет | Да | Да | Да |
-| Редактор | Не задан отдельно | Не задан отдельно | Zed | VS Code |
+| Редактор | Не задан отдельно | Не задан отдельно | Не задан отдельно | Не задан отдельно |
 | MAX через Flatpak | Нет | Нет | Да | Да |
 | Amnezia VPN | Нет | Нет | Да | Да |
 | Boxflat / MOZA | Нет | Да | Нет | Нет |
