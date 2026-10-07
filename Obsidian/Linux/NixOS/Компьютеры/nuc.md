@@ -96,11 +96,11 @@ NVIDIA-модули этому компьютеру не нужны. Работ�
 
 ## Рабочие приложения
 
-Steam, GameMode, LibreOffice, Telegram, MAX через Flatpak, Obsidian, Pinta, Remmina, Transmission, Amnezia VPN. Автовход nikolaev включён.
+Steam, GameMode, LibreOffice, Telegram, MAX через Flatpak, Obsidian, Pinta, Remmina, Zed, Transmission, Amnezia VPN. Автовход nikolaev включён.
 
 MAX устанавливает install-max.service, но обновляется отдельно через Flatpak. Импорт VPN-конфигурации выполняется пользователем. См. [[Linux/NixOS/GNOME и приложения|общую заметку]].
 
-VS Code удалён из профиля 7 октября. Zed в профиль не включён. Личные настройки редакторов автоматически не удаляются.
+В профиль включён Zed (`zed-editor`); запуск: `zeditor` или через меню GNOME. VS Code не включён.
 
 ## KVM
 
