@@ -4,6 +4,7 @@
 
 ## Оглавление
 
+- [Настройка нового компьютера и синхронизация](#настройка-нового-компьютера-и-синхронизация-с-github)
 - [Главное оглавление](Obsidian/%D0%A1%D0%BE%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D0%BD%D0%B8%D0%B5.md)
 - [Linux](Obsidian/Linux/%D0%9E%D0%B1%D0%B7%D0%BE%D1%80.md)
 - [Arch Linux](Obsidian/Linux/Arch/%D0%9E%D0%B1%D0%B7%D0%BE%D1%80.md)
@@ -19,12 +20,360 @@
 - [Задачи](Obsidian/%D0%97%D0%B0%D0%B4%D0%B0%D1%87%D0%B8.md)
 - [Покупки](Obsidian/%D0%9F%D1%80%D0%B8%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C.md)
 
+## Настройка нового компьютера и синхронизация с GitHub
+
+Инструкция для репозитория **nikolaevmpf/obsidian**, ветка **main**. На каждом компьютере нужна отдельная локальная копия репозитория и собственный SSH-ключ, добавленный в аккаунт GitHub **nikolaevmpf**.
+
+### 1. Установить Obsidian, Git и OpenSSH
+
+Установите настольный [Obsidian](https://obsidian.md/download). Плагин [GitHub Sync](https://github.com/kevinmkchin/Obsidian-GitHub-Sync) от Kevin Chin работает только на компьютерах, не на Android/iOS.
+
+Для своей системы выберите один вариант:
+
+**NixOS:** добавьте пакеты в существующий список `environment.systemPackages` конфигурации своего компьютера:
+
+```nix
+environment.systemPackages = with pkgs; [
+  git
+  openssh
+  obsidian
+];
+```
+
+Если список уже есть, дополните его, не создавая второй. Примените конфигурацию обычной командой сборки своего профиля. В репозитории gnome-config можно использовать уже настроенную команду `nix-update` после внесения и получения изменений конфигурации.
+
+**Ubuntu / Debian / Astra Linux:**
+
+```bash
+sudo apt update
+sudo apt install git openssh-client
+```
+
+**Arch Linux:**
+
+```bash
+sudo pacman -Syu git openssh obsidian
+```
+
+**Windows:** установите [Git for Windows](https://git-scm.com/downloads/win) и Obsidian. Все Bash-команды ниже выполняйте в **Git Bash**. В Linux используйте обычный терминал.
+
+Проверьте:
+
+```bash
+git --version
+ssh -V
+```
+
+Все следующие команды выполняются от обычного пользователя, **без sudo**, отдельными строками. В примерах локальная копия находится в `~/obsidian`.
+
+### 2. Создать SSH-ключ на этом компьютере
+
+Проверьте наличие ключа:
+
+```bash
+ls -l ~/.ssh/github_ed25519 ~/.ssh/github_ed25519.pub
+```
+
+Если файлов нет, создайте ключ. В комментарии замените `NEW-PC` названием компьютера:
+
+```bash
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+ssh-keygen -t ed25519 -C "nikolaev@NEW-PC GitHub" -f ~/.ssh/github_ed25519
+```
+
+Задайте парольную фразу и повторите её. Если ключ уже существует, **не перезаписывайте его**; сначала проверьте, зарегистрирован ли он на GitHub.
+
+Приватный ключ `github_ed25519` остаётся на этом компьютере. На GitHub передаётся только публичный ключ `github_ed25519.pub`.
+
+### 3. Добавить публичный ключ на GitHub
+
+Покажите публичный ключ:
+
+```bash
+cat ~/.ssh/github_ed25519.pub
+```
+
+1. Войдите в GitHub под аккаунтом **nikolaevmpf**.
+2. Откройте [Settings → SSH and GPG keys](https://github.com/settings/keys).
+3. Нажмите **New SSH key**.
+4. В **Title** укажите имя компьютера.
+5. В **Key type** выберите **Authentication Key**.
+6. В **Key** вставьте всю строку `ssh-ed25519 AAAA…` из команды выше.
+7. Нажмите **Add SSH key**.
+
+В поле Key вставляется публичный ключ, **не отпечаток SHA256**. При подключении ещё одного компьютера добавляйте новый ключ, не удаляя ключи остальных устройств.
+
+### 4. Настроить SSH и проверить доступ
+
+Откройте или создайте файл `~/.ssh/config` в текстовом редакторе. В Linux, если установлен nano:
+
+```bash
+nano ~/.ssh/config
+```
+
+Добавьте блок. Если `Host github.com` уже есть, измените существующий блок:
+
+```sshconfig
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/github_ed25519
+    IdentitiesOnly yes
+```
+
+В Windows можно открыть файл редактором; сохраните именно `config`, без расширения `.txt`.
+
+```bash
+chmod 600 ~/.ssh/config ~/.ssh/github_ed25519
+ssh -T git@github.com
+```
+
+При первом подключении сверьте отпечаток с [официальными отпечатками GitHub](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints). На момент написания инструкции отпечаток ED25519:
+
+```text
+SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
+```
+
+Если совпадает, введите `yes`. При запросе парольной фразы введите её.
+
+Успешный ответ:
+
+```text
+Hi nikolaevmpf! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+Отсутствие shell-доступа нормально. Команда `ssh -T` при успешной проверке GitHub может завершиться с кодом 1; ориентируйтесь на текст ответа.
+
+Для синхронизации из графического Obsidian ключ должен быть доступен без интерактивного запроса парольной фразы. Загрузите его в SSH-агент текущей сессии:
+
+```bash
+ssh-add ~/.ssh/github_ed25519
+```
+
+Если команда сообщает, что соединиться с агентом невозможно:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/github_ed25519
+```
+
+Агент, запущенный таким способом в терминале, не становится автоматически доступен уже работающему Obsidian или приложению, запущенному из меню. Закройте Obsidian полностью и запустите из этого же терминала, например в Linux:
+
+```bash
+obsidian
+```
+
+Для постоянной работы используйте SSH-агент, интегрированный в графическую сессию своей ОС. После выхода из системы ключ может потребоваться загрузить снова.
+
+### 5. Клонировать существующий репозиторий
+
+После успешной проверки SSH:
+
+```bash
+cd ~
+git clone git@github.com:nikolaevmpf/obsidian.git
+cd ~/obsidian
+```
+
+Если каталог `~/obsidian` уже существует, не удаляйте его и не клонируйте поверх: сначала убедитесь, что это нужная копия через `git status` и `git remote -v`.
+
+Для существующего клона с HTTPS замените адрес:
+
+```bash
+cd ~/obsidian
+git remote set-url origin git@github.com:nikolaevmpf/obsidian.git
+```
+
+Не выполняйте `git init` внутри вложенной папки `Obsidian`: репозиторий уже создан в родительской папке.
+
+### 6. Настроить автора коммитов и ветку
+
+Замените email адресом из своей учётной записи GitHub. Можно использовать личный noreply-адрес из [настроек email GitHub](https://github.com/settings/emails).
+
+```bash
+cd ~/obsidian
+git config user.name "nikolaevmpf"
+git config user.email "YOUR_GITHUB_EMAIL"
+git remote -v
+git branch --show-current
+git fetch origin
+git branch --set-upstream-to=origin/main main
+git status
+```
+
+Адреса fetch и push должны быть `git@github.com:nikolaevmpf/obsidian.git`, текущая ветка — `main`. Если ветка другая, сначала проверьте незакоммиченные изменения; для этого хранилища работайте в `main`.
+
+Проверьте право отправки:
+
+```bash
+git push -u origin main
+```
+
+Для свежего клона ожидается `Everything up-to-date`. Имя пользователя и пароль GitHub при SSH не запрашиваются. Настройки автора коммитов задаются локально для этого репозитория.
+
+### 7. Открыть нужную папку в Obsidian
+
+Структура локальной копии:
+
+```text
+~/obsidian/                 — корень Git-репозитория
+    README.md
+    Obsidian/               — папка хранилища заметок
+        Содержание.md
+        Linux/
+        Windows/
+        Рецепты/
+```
+
+В Obsidian выберите **Открыть папку как хранилище** → **~/obsidian/Obsidian**. На Linux для пользователя nikolaev это `/home/nikolaev/obsidian/Obsidian`; на Windows обычно `C:\Users\ИМЯ_ПОЛЬЗОВАТЕЛЯ\obsidian\Obsidian`.
+
+Откройте заметку **Содержание**. Ссылки используют пути от этой папки; поэтому выбирайте вложенную папку, а не корень репозитория. Git находит репозиторий в родительском каталоге.
+
+Настройки Obsidian зависят от открытой папки: если раньше был открыт корень репозитория, при переходе во вложенную папку может потребоваться повторно включить плагин. Заметки переносить не нужно.
+
+### 8. Установить и настроить GitHub Sync
+
+В Obsidian откройте **Настройки → Сторонние плагины → Обзор**, найдите **GitHub Sync** от **Kevin Chin**, установите и включите его.
+
+Настройте:
+
+| Поле | Значение для начала |
+| --- | --- |
+| Remote URL | `git@github.com:nikolaevmpf/obsidian.git` |
+| git binary location | Пусто, если Git доступен Obsidian через PATH |
+| Check status on startup | Включено |
+| Auto sync on startup | Выключено до проверки |
+| Auto sync at interval | `0` — ручная синхронизация |
+| Notice level | `ALL` |
+| Hide Success Message | Выключено |
+
+**Remote URL должен быть SSH-адресом именно в плагине.** При синхронизации он перезаписывает `origin`; исправления адреса только через терминал недостаточно.
+
+Если Git не найден, выполните в Linux / Git Bash `command -v git` и укажите в настройке каталог, содержащий исполняемый файл, с завершающим `/`, без имени `git` или `git.exe`. Для Windows типичный вариант — `C:/Program Files/Git/cmd/`, но проверьте свой путь. После изменения полностью перезапустите Obsidian.
+
+Не вставляйте токен доступа в Remote URL.
+
+### 9. Проверить полный цикл синхронизации
+
+1. Выполните **Sync with Remote** через значок GitHub слева или палитру команд.
+2. Создайте в Obsidian временную заметку `Проверка синхронизации` с названием компьютера.
+3. Дождитесь сохранения файла и снова выполните **Sync with Remote**.
+4. Откройте [папку Obsidian на GitHub](https://github.com/nikolaevmpf/obsidian/tree/main/Obsidian) и убедитесь, что заметка появилась в ветке `main`.
+5. Удалите временную заметку в Obsidian и синхронизируйте ещё раз.
+6. На другом компьютере выполните синхронизацию и проверьте получение изменений.
+
+При необходимости проверьте из терминала:
+
+```bash
+cd ~/obsidian
+git fetch origin
+git status
+git log -3 --oneline
+git branch -vv
+```
+
+После успешной синхронизации локальная ветка не должна отставать или опережать `origin/main`.
+
+После проверки можно включить **Auto sync on startup** и задать **Auto sync at interval = 10** минут, затем перезапустить Obsidian. Синхронизация по интервалу выполняется только пока Obsidian работает. В просмотренном коде автосинхронизация при запуске срабатывает, если локальная ветка отстаёт от удалённой; это не безусловная отправка накопленных коммитов.
+
+### 10. Ежедневная работа на нескольких компьютерах
+
+- Перед редактированием нажмите **Sync with Remote** и дождитесь завершения.
+- После работы снова синхронизируйте и проверьте отсутствие ошибок.
+- Перед переходом на другой компьютер завершите отправку на текущем, затем получите изменения на новом.
+- Перед передачей заметок на редактирование через GitHub отправьте последние локальные изменения; после завершения получите результат синхронизацией.
+- По возможности не редактируйте одновременно один участок заметки на разных компьютерах.
+- Каждый компьютер использует свой SSH-ключ и собственную настройку GitHub Sync.
+- Плагин работает с `main`; не используйте его для переключения веток.
+- GitHub хранит историю коммитов, но отдельная резервная копия хранилища также полезна.
+
+### 11. Исключить локальные настройки из Git
+
+При необходимости добавьте в существующий `.gitignore` в корне `~/obsidian`:
+
+```gitignore
+# Расположение окон на каждом компьютере
+Obsidian/.obsidian/workspace*.json
+
+# Настройки синхронизации конкретного компьютера
+Obsidian/.obsidian/plugins/github-sync/data.json
+
+# Корзина
+Obsidian/.trash/
+
+# Если раньше хранилище открывалось из корня репозитория
+.obsidian/workspace*.json
+.obsidian/plugins/github-sync/data.json
+.trash/
+```
+
+Остальные настройки и файлы плагинов можно синхронизировать, если нужен одинаковый набор на устройствах. Уже отслеживаемые файлы не перестают отслеживаться после добавления в `.gitignore`. Чтобы убрать конкретный файл из индекса, сохранив его локально, используйте `git rm --cached ПУТЬ_К_ФАЙЛУ`, затем закоммитьте изменения. Делайте это только для проверенных путей.
+
+### 12. Если синхронизация не работает
+
+**Permission denied (publickey)**
+
+```bash
+ssh -T git@github.com
+ssh -G github.com | grep -E '^(hostname|user|identityfile|identitiesonly) '
+ssh-keygen -lf ~/.ssh/github_ed25519.pub
+```
+
+Сравните отпечаток с ключом в [GitHub → SSH and GPG keys](https://github.com/settings/keys). Ключ должен быть добавлен как **Authentication Key**. Если проверка работает в терминале, но не в Obsidian, проверьте доступ приложения к SSH-агенту и парольной фразе (шаг 4).
+
+**Git запрашивает Username for https://github.com**
+
+Укажите SSH-адрес в **Remote URL плагина**, затем исправьте локальный адрес:
+
+```bash
+cd ~/obsidian
+git remote set-url origin git@github.com:nikolaevmpf/obsidian.git
+git remote -v
+git push -u origin main
+```
+
+**Заметка изменена, но на GitHub ничего нет**
+
+```bash
+cd ~/obsidian
+git status
+git log -3 --oneline
+git branch -vv
+```
+
+Если появился новый коммит и локальная ветка опережает удалённую, выполните:
+
+```bash
+git push origin main
+```
+
+В просмотренной реализации GitHub Sync отправка выполняется только при наличии незакоммиченных изменений в начале операции. Поэтому после неудачной отправки следующий запуск с чистым рабочим каталогом может не отправить уже созданный коммит. Ручной `git push` отправляет накопленное.
+
+Если `git status` чистый и нового коммита нет, убедитесь, что редактируете файл в открытой локальной копии `~/obsidian/Obsidian`, а не в другом хранилище.
+
+**Конфликт при получении изменений**
+
+Отключите автосинхронизацию на время разрешения конфликта. Проверьте `git status`, откройте конфликтные файлы и сохраните нужный текст, удалив маркеры `<<<<<<<`, `=======`, `>>>>>>>`. Затем из корня репозитория:
+
+```bash
+git add -- "Obsidian/ПУТЬ_К_ИСПРАВЛЕННОЙ_ЗАМЕТКЕ.md"
+git commit
+git push origin main
+```
+
+Повторите `git add` для каждого исправленного файла. Команды выше относятся к конфликту слияния, создаваемому плагином. Не нажимайте повторную синхронизацию с неразрешёнными конфликтами и не используйте force push.
+
+Если push отклонён из-за новых удалённых коммитов, при чистом рабочем каталоге выполните `git pull --no-rebase origin main`, разрешите конфликты при наличии и повторите `git push origin main`.
+
+Источники: [README GitHub Sync](https://github.com/kevinmkchin/Obsidian-GitHub-Sync/blob/main/README.md), [код синхронизации и настроек](https://github.com/kevinmkchin/Obsidian-GitHub-Sync/blob/main/main.ts), [проверка SSH-доступа к GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection).
+
 ## Открыть в Obsidian
 
 1. Клонируйте репозиторий:
 
    ```bash
-   git clone https://github.com/nikolaevmpf/obsidian.git
+   git clone git@github.com:nikolaevmpf/obsidian.git
    ```
 
 2. В Obsidian выберите **Открыть папку как хранилище** и укажите папку `obsidian/Obsidian` внутри клонированного репозитория.
