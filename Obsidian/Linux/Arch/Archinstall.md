@@ -1,6 +1,17 @@
 # Arch Linux: установка через archinstall
 
-Рабочий стол — GNOME. Ручная установка: [[Linux/Arch/Install|Ручная установка]]. Настройки рабочего стола: [[Gnome]].
+[[Содержание|Главное оглавление]] · [[Linux/Arch/Обзор|Arch Linux]]
+
+Рабочий стол — GNOME. Ручная установка: [[Linux/Arch/Install|Ручная установка]]. Настройки рабочего стола: [[Linux/Arch/Gnome|Arch Linux: GNOME]].
+
+## Оглавление заметки
+
+- [[Linux/Arch/Archinstall#Загрузочная флешка|Загрузочная флешка]]
+- [[Linux/Arch/Archinstall#В установочном образе|В установочном образе]]
+- [[Linux/Arch/Archinstall#После установки|После установки]]
+- [[Linux/Arch/Archinstall#AUR: установка yay|AUR: установка yay]]
+- [[Linux/Arch/Archinstall#Zsh — необязательно|Zsh — необязательно]]
+- [[Linux/Arch/Archinstall#Проверка|Проверка]]
 
 ## Загрузочная флешка
 
@@ -31,7 +42,7 @@ ls /sys/firmware/efi/efivars  # Проверка UEFI
 timedatectl set-ntp true
 ```
 
-Для Wi-Fi см. [[wifi]]. При проводном подключении сеть обычно настраивается автоматически.
+Для Wi-Fi см. [[Linux/Arch/wifi|Wi-Fi: подключение]]. При проводном подключении сеть обычно настраивается автоматически.
 
 ```bash
 ping -c 3 archlinux.org
@@ -79,7 +90,7 @@ pacman -Q epiphany gnome-connections gnome-tour gnome-software \
 sudo pacman -Rs epiphany gnome-tour
 ```
 
-Перед подтверждением проверьте зависимости. Межсетевой экран: [[ufw]].
+Перед подтверждением проверьте зависимости. Межсетевой экран: [[Linux/Utility/ufw|UFW: межсетевой экран]].
 
 ## AUR: установка yay
 

@@ -1,5 +1,7 @@
 # UFW: межсетевой экран
 
+[[Содержание|Главное оглавление]] · [[Linux/Utility/Обзор|Утилиты и сервисы Linux]]
+
 ## Установка
 
 Arch Linux:
@@ -57,3 +59,11 @@ sudo ufw delete 1
 ```
 
 После удаления номера правил меняются.
+
+## Связанные заметки
+
+- [[Linux/Ubuntu/Zabbix|Ubuntu 24.04: Zabbix 7.0 + PostgreSQL]]
+- [[Linux/Ubuntu/Proxy|Ubuntu: прокси]]
+- [[Linux/Utility/Vaultwarden|Vaultwarden: Docker + Nginx]]
+- [[Linux/Utility/rsync|rsync: резервное копирование]]
+- [[Linux/Utility/ssh|SSH: ключи и сервер]]

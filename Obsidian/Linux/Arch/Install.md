@@ -1,13 +1,23 @@
 # Arch Linux: ручная установка UEFI
 
-Краткий пример для **пустого диска `/dev/sda`**. Для NVMe имена будут другими. Автоматический вариант: [[Archinstall]].
+[[Содержание|Главное оглавление]] · [[Linux/Arch/Обзор|Arch Linux]]
+
+Краткий пример для **пустого диска `/dev/sda`**. Для NVMe имена будут другими. Автоматический вариант: [[Linux/Arch/Archinstall|Arch Linux: установка через archinstall]].
 
 > [!warning] Форматирование
 > Проверьте диск через `lsblk` и сохраните данные. Пример не подходит для dual boot без изменения разметки.
 
+## Оглавление заметки
+
+- [[Linux/Arch/Install#1. Сеть и диск|1. Сеть и диск]]
+- [[Linux/Arch/Install#2. Базовая система|2. Базовая система]]
+- [[Linux/Arch/Install#3. Время, язык и имя|3. Время, язык и имя]]
+- [[Linux/Arch/Install#4. Пользователь и службы|4. Пользователь и службы]]
+- [[Linux/Arch/Install#5. Загрузчик и перезагрузка|5. Загрузчик и перезагрузка]]
+
 ## 1. Сеть и диск
 
-В live-системе выполняйте команды от root. Подключение Wi-Fi: [[wifi]]. Прокси при необходимости: [[Proxy]].
+В live-системе выполняйте команды от root. Подключение Wi-Fi: [[Linux/Arch/wifi|Wi-Fi: подключение]]. Прокси при необходимости: [[Linux/Ubuntu/Proxy|Ubuntu: прокси]].
 
 ```bash
 ls /sys/firmware/efi/efivars  # Убедиться, что загрузились в UEFI
@@ -17,7 +27,7 @@ lsblk -o NAME,SIZE,MODEL,FSTYPE,MOUNTPOINTS
 fdisk /dev/sda
 ```
 
-В `fdisk` создайте GPT и три раздела; шпаргалка: [[fdisk]].
+В `fdisk` создайте GPT и три раздела; шпаргалка: [[Linux/Utility/fdisk|fdisk: разметка диска]].
 
 | Раздел | Пример размера | Тип |
 | --- | --- | --- |
@@ -120,6 +130,6 @@ umount -R /mnt
 reboot
 ```
 
-После загрузки установите [[Gnome]] или другой рабочий стол. Виртуальные машины: [[KVM-QEMU]], [[Virtualbox]].
+После загрузки установите [[Linux/Arch/Gnome|Arch Linux: GNOME]] или другой рабочий стол. Виртуальные машины: [[Linux/Arch/KVM-QEMU|KVM / QEMU]], [[Linux/Arch/Virtualbox|VirtualBox на Arch Linux]].
 
 [ArchWiki: установка](https://wiki.archlinux.org/title/Installation_guide)

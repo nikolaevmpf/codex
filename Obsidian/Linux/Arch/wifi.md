@@ -1,5 +1,7 @@
 # Wi-Fi: подключение
 
+[[Содержание|Главное оглавление]] · [[Linux/Arch/Обзор|Arch Linux]]
+
 ## Проверка блокировки
 
 ```bash
@@ -44,3 +46,8 @@ ip address
 ip route
 ping -c 3 archlinux.org
 ```
+
+## Связанные заметки
+
+- [[Linux/Arch/Archinstall|Arch Linux: установка через archinstall]]
+- [[Linux/Arch/Gnome|Arch Linux: GNOME]]

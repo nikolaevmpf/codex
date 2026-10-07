@@ -1,6 +1,16 @@
 # Ubuntu 24.04: Zabbix 7.0 + PostgreSQL
 
-Пример сервера с Nginx. Для прокси см. [[Proxy]]. Пакеты репозитория проверяйте по [официальной инструкции](https://www.zabbix.com/download).
+[[Содержание|Главное оглавление]] · [[Linux/Ubuntu/Обзор|Ubuntu]]
+
+Пример сервера с Nginx. Для прокси см. [[Linux/Ubuntu/Proxy|Ubuntu: прокси]]. Пакеты репозитория проверяйте по [официальной инструкции](https://www.zabbix.com/download).
+
+## Оглавление заметки
+
+- [[Linux/Ubuntu/Zabbix#Репозиторий и пакеты|Репозиторий и пакеты]]
+- [[Linux/Ubuntu/Zabbix#База данных|База данных]]
+- [[Linux/Ubuntu/Zabbix#Конфигурация|Конфигурация]]
+- [[Linux/Ubuntu/Zabbix#Проверка|Проверка]]
+- [[Linux/Ubuntu/Zabbix#Агент: только активные проверки|Агент: только активные проверки]]
 
 ## Репозиторий и пакеты
 
@@ -89,3 +99,7 @@ HostMetadataItem=system.uname
 sudo systemctl enable --now zabbix-agent.service
 sudo systemctl restart zabbix-agent.service
 ```
+
+## Связанные заметки
+
+- [[Linux/Utility/ufw|UFW: межсетевой экран]]

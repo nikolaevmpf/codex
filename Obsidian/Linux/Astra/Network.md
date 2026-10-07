@@ -1,5 +1,7 @@
 # Astra Linux: статический IP
 
+[[Содержание|Главное оглавление]] · [[Linux/Astra/Обзор|Astra Linux]]
+
 Замените интерфейс, адрес, шлюз и DNS своими. Выберите способ для используемого сетевого менеджера.
 
 > [!warning] Удалённое подключение
@@ -55,3 +57,8 @@ getent hosts astralinux.ru
 ```
 
 Если система использует Netplan, настройка выполняется в `/etc/netplan/*.yaml`; см. [[Linux/Ubuntu/Install|Ubuntu: сеть]].
+
+## Связанные заметки
+
+- [[Linux/Network/Netplan|Переход с Netplan на systemd-networkd]]
+- [[Linux/Network/Systemd-networkd|Сеть: systemd-networkd]]

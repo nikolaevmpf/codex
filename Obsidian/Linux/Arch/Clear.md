@@ -1,5 +1,7 @@
 # Arch Linux: очистка
 
+[[Содержание|Главное оглавление]] · [[Linux/Arch/Обзор|Arch Linux]]
+
 ## Кэш пакетов
 
 ```bash
@@ -38,3 +40,7 @@ sudo systemd-tmpfiles --clean
 ```bash
 fc-cache -f  # Перестроить кэш шрифтов текущего пользователя
 ```
+
+## Связанные заметки
+
+- [[Linux/Arch/Archinstall|Arch Linux: установка через archinstall]]

@@ -1,6 +1,19 @@
 # Ubuntu 24.04: после установки
 
+[[Содержание|Главное оглавление]] · [[Linux/Ubuntu/Обзор|Ubuntu]]
+
 Выбирайте нужные программы; устанавливать всё сразу необязательно. Сеть и драйверы: [[Linux/Ubuntu/Install|Базовая настройка]].
+
+## Оглавление заметки
+
+- [[Linux/Ubuntu/After install#Обновление|Обновление]]
+- [[Linux/Ubuntu/After install#Программы из APT и Snap|Программы из APT и Snap]]
+- [[Linux/Ubuntu/After install#Chrome — пакет DEB|Chrome — пакет DEB]]
+- [[Linux/Ubuntu/After install#Flatpak — альтернативный источник|Flatpak — альтернативный источник]]
+- [[Linux/Ubuntu/After install#GNOME|GNOME]]
+- [[Linux/Ubuntu/After install#Snap — удаление только при необходимости|Snap — удаление только при необходимости]]
+- [[Linux/Ubuntu/After install#VMware Workstation|VMware Workstation]]
+- [[Linux/Ubuntu/After install#VPN|VPN]]
 
 ## Обновление
 
@@ -93,3 +106,7 @@ sudo apt install network-manager-openvpn-gnome network-manager-openconnect-gnome
 ```
 
 OpenConnect подходит для совместимых серверов Cisco AnyConnect. Профиль создайте в настройках сети.
+
+## Связанные заметки
+
+- [[Linux/Ubuntu/Cloud-init|Ubuntu: отключение cloud-init]]

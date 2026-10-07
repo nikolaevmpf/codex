@@ -1,5 +1,7 @@
 # Переход с Netplan на systemd-networkd
 
+[[Содержание|Главное оглавление]] · [[Linux/Network/Обзор|Сеть Linux]]
+
 Netplan генерирует настройки для networkd или NetworkManager. Удалять `netplan.io` обычно не требуется: можно оставить `renderer: networkd`.
 
 ## Если нужен прямой конфиг networkd
@@ -8,7 +10,7 @@ Netplan генерирует настройки для networkd или NetworkMa
 > Делайте переход с локальной консоли и сохраните существующие YAML-файлы и `/etc/resolv.conf`.
 
 1. Узнайте интерфейс: `ip link`.
-2. Подготовьте соответствующий `.network` по заметке [[Systemd-networkd]].
+2. Подготовьте соответствующий `.network` по заметке [[Linux/Network/Systemd-networkd|Сеть: systemd-networkd]].
 3. Если переходите полностью, уберите YAML-файлы Netplan из `/etc/netplan/` в резервный каталог.
 4. Выполните `sudo netplan generate`, проверьте `/run/systemd/network/`: старые сгенерированные настройки не должны перекрывать новый файл.
 5. Только после подготовки отключите прежний менеджер, если он использовался.
@@ -33,3 +35,8 @@ getent hosts ubuntu.com
 ```
 
 Удаление `netplan.io` рассмотрите отдельно, после проверки работы сети и зависимостей пакета.
+
+## Связанные заметки
+
+- [[Linux/Ubuntu/Install|Ubuntu: базовая настройка]]
+- [[Linux/Astra/Network|Astra Linux: статический IP]]

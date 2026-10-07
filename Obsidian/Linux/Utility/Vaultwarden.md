@@ -1,6 +1,19 @@
 # Vaultwarden: Docker + Nginx
 
+[[Содержание|Главное оглавление]] · [[Linux/Utility/Обзор|Утилиты и сервисы Linux]]
+
 Пример для Arch Linux в локальной сети: `02vault.gz.local`, IP `10.2.1.151`. Замените домен и адрес своими. TLS завершает Nginx; контейнер доступен только на loopback.
+
+## Оглавление заметки
+
+- [[Linux/Utility/Vaultwarden#Пакеты|Пакеты]]
+- [[Linux/Utility/Vaultwarden#Прокси Docker — если требуется|Прокси Docker — если требуется]]
+- [[Linux/Utility/Vaultwarden#Compose|Compose]]
+- [[Linux/Utility/Vaultwarden#TLS для локальной сети|TLS для локальной сети]]
+- [[Linux/Utility/Vaultwarden#Nginx|Nginx]]
+- [[Linux/Utility/Vaultwarden#Первый пользователь|Первый пользователь]]
+- [[Linux/Utility/Vaultwarden#Проверка|Проверка]]
+- [[Linux/Utility/Vaultwarden#Резервная копия и обновление|Резервная копия и обновление]]
 
 ## Пакеты
 
@@ -166,3 +179,8 @@ sudo docker compose logs --tail=50 vaultwarden
 Автоматическое обновление без проверки и резервной копии не настраивайте.
 
 [Документация Vaultwarden](https://github.com/dani-garcia/vaultwarden/wiki)
+
+## Связанные заметки
+
+- [[Linux/Utility/rsync|rsync: резервное копирование]]
+- [[Linux/Utility/ufw|UFW: межсетевой экран]]

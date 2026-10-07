@@ -1,5 +1,7 @@
 # Arch Linux: GNOME
 
+[[Содержание|Главное оглавление]] · [[Linux/Arch/Обзор|Arch Linux]]
+
 ## Установка
 
 ```bash
@@ -14,7 +16,7 @@ sudo systemctl enable NetworkManager.service
 
 ## Оформление
 
-Выполняйте в своей сессии GNOME, без sudo. Темы предварительно установите; см. [[Archinstall]].
+Выполняйте в своей сессии GNOME, без sudo. Темы предварительно установите; см. [[Linux/Arch/Archinstall|Arch Linux: установка через archinstall]].
 
 ```bash
 # Тёмный стиль, значки, курсор
@@ -59,3 +61,7 @@ systemctl --failed
 # Перезагрузка — после сохранения работы
 sudo reboot
 ```
+
+## Связанные заметки
+
+- [[Linux/Arch/Install|Arch Linux: ручная установка UEFI]]

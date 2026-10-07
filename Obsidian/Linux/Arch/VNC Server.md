@@ -1,5 +1,7 @@
 # TigerVNC на Arch Linux
 
+[[Содержание|Главное оглавление]] · [[Linux/Arch/Обзор|Arch Linux]]
+
 Отдельный удалённый рабочий стол X11. Сессия GNOME Wayland для этого примера не подходит.
 
 ## Пользователь
@@ -46,4 +48,4 @@ systemctl status vncserver@:4.service
 ssh -N -L 5904:localhost:5904 username@server
 ```
 
-VNC-клиент подключайте к `localhost:5904`. Параметр `localhost` не открывает VNC в сеть; на сервере должен работать [[ssh|SSH]].
+VNC-клиент подключайте к `localhost:5904`. Параметр `localhost` не открывает VNC в сеть; на сервере должен работать [[Linux/Utility/ssh|SSH]].

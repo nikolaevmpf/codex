@@ -1,5 +1,7 @@
 # VirtualBox на Arch Linux
 
+[[Содержание|Главное оглавление]] · [[Linux/Arch/Обзор|Arch Linux]]
+
 ## Установка на хост
 
 Для стандартного ядра `linux`:
@@ -48,3 +50,7 @@ sudo systemctl enable --now vboxservice.service
 ```
 
 Для гостя без графики используйте `virtualbox-guest-utils-nox` вместо графического пакета.
+
+## Связанные заметки
+
+- [[Linux/Arch/KVM-QEMU|KVM / QEMU]]

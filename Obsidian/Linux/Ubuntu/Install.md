@@ -1,6 +1,17 @@
 # Ubuntu: базовая настройка
 
-Примеры для Ubuntu 24.04. Адреса, интерфейсы и домен замените своими. Приложения: [[After install]], прокси: [[Proxy]], мониторинг: [[Zabbix]].
+[[Содержание|Главное оглавление]] · [[Linux/Ubuntu/Обзор|Ubuntu]]
+
+Примеры для Ubuntu 24.04. Адреса, интерфейсы и домен замените своими. Приложения: [[Linux/Ubuntu/After install|Ubuntu 24.04: после установки]], прокси: [[Linux/Ubuntu/Proxy|Ubuntu: прокси]], мониторинг: [[Linux/Ubuntu/Zabbix|Ubuntu 24.04: Zabbix 7.0 + PostgreSQL]].
+
+## Оглавление заметки
+
+- [[Linux/Ubuntu/Install#Сеть через Netplan|Сеть через Netplan]]
+- [[Linux/Ubuntu/Install#Обновление и SSH|Обновление и SSH]]
+- [[Linux/Ubuntu/Install#Видеодрайверы|Видеодрайверы]]
+- [[Linux/Ubuntu/Install#Звук|Звук]]
+- [[Linux/Ubuntu/Install#Гостевая VMware|Гостевая VMware]]
+- [[Linux/Ubuntu/Install#Полезные команды|Полезные команды]]
 
 ## Сеть через Netplan
 
@@ -41,7 +52,7 @@ sudo apt install openssh-server
 sudo systemctl enable --now ssh.service
 ```
 
-Настройка ключей: [[ssh]]. Перед включением UFW разрешите порт SSH: [[ufw]].
+Настройка ключей: [[Linux/Utility/ssh|SSH: ключи и сервер]]. Перед включением UFW разрешите порт SSH: [[Linux/Utility/ufw|UFW: межсетевой экран]].
 
 В `~/.bashrc` можно добавить один раз:
 
@@ -91,3 +102,10 @@ sudo cdpr -d eth1 # Обнаружение CDP; заменить интерфе�
 sudo reboot      # Перезагрузка
 # sudo poweroff  # Выключение
 ```
+
+## Связанные заметки
+
+- [[Linux/Network/Netplan|Переход с Netplan на systemd-networkd]]
+- [[Linux/Network/Systemd-networkd|Сеть: systemd-networkd]]
+- [[Linux/Astra/Network|Astra Linux: статический IP]]
+- [[Linux/Ubuntu/Cloud-init|Ubuntu: отключение cloud-init]]

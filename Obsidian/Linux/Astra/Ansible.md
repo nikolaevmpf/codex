@@ -1,5 +1,7 @@
 # Astra Linux: Ansible
 
+[[Содержание|Главное оглавление]] · [[Linux/Astra/Обзор|Astra Linux]]
+
 ## Установка
 
 ```bash
@@ -8,7 +10,7 @@ sudo apt install ansible
 ansible --version
 ```
 
-SSH-ключи предпочтительнее паролей; см. [[ssh]]. `sshpass` нужен только для подключения по паролю:
+SSH-ключи предпочтительнее паролей; см. [[Linux/Utility/ssh|SSH: ключи и сервер]]. `sshpass` нужен только для подключения по паролю:
 
 ```bash
 sudo apt install sshpass

@@ -1,6 +1,17 @@
 # KVM / QEMU
 
+[[Содержание|Главное оглавление]] · [[Linux/Arch/Обзор|Arch Linux]]
+
 Виртуальные машины Linux с аппаратной виртуализацией. В UEFI должны быть включены Intel VT-x или AMD-V.
+
+## Оглавление заметки
+
+- [[Linux/Arch/KVM-QEMU#Хост Arch Linux|Хост Arch Linux]]
+- [[Linux/Arch/KVM-QEMU#Агент внутри гостевой ОС|Агент внутри гостевой ОС]]
+- [[Linux/Arch/KVM-QEMU#UFW — при проблемах с сетью гостя|UFW — при проблемах с сетью гостя]]
+- [[Linux/Arch/KVM-QEMU#Экспорт ВМ|Экспорт ВМ]]
+- [[Linux/Arch/KVM-QEMU#Импорт ВМ|Импорт ВМ]]
+- [[Linux/Arch/KVM-QEMU#Установка по сети|Установка по сети]]
 
 ## Хост Arch Linux
 
@@ -81,3 +92,7 @@ sudo virsh -c qemu:///system define /mnt/Data/VM/Win11/win11.xml
 ```text
 https://deb.debian.org/debian/dists/trixie/main/installer-amd64/
 ```
+
+## Связанные заметки
+
+- [[Linux/Arch/Virtualbox|VirtualBox на Arch Linux]]

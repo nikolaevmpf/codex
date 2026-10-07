@@ -1,5 +1,7 @@
 # fdisk: разметка диска
 
+[[Содержание|Главное оглавление]] · [[Linux/Utility/Обзор|Утилиты и сервисы Linux]]
+
 ```bash
 lsblk -o NAME,SIZE,MODEL,FSTYPE,MOUNTPOINTS
 sudo fdisk /dev/sdX  # Заменить устройством, не разделом
