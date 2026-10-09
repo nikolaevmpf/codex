@@ -1,36 +1,49 @@
-# Dell Latitude 3410 — подготовка отдельного профиля
+# Dell Latitude 3410
 
-[[Linux/NixOS/Обзор|Все компьютеры]] · [[Linux/NixOS/История проекта|История]]
+[[Linux/NixOS/Обзор|Все компьютеры]] · [[Linux/NixOS/Обновление и откат|Обновление]]
 
-> [!info] Профиль ещё не создан
-> В текущем gnome-config есть vm, zet, 02i0132 и nuc. Dell в flake.nix не объявлен. Не использовать для ноутбука чужие UUID или команды с несуществующим профилем.
+Профиль `dell`: Intel UHD Comet Lake-U (i915), Intel AX201 (iwlwifi), UEFI,
+KIOXIA NVMe 256 ГБ. EFI UUID: `56FE-B413`; Btrfs UUID:
+`2629ed44-c0b4-447f-b5bf-8df2f8bc698b`.
+Подтома: @root → /, @home → /home, @nix → /nix, @log → /var/log.
 
-## Что известно из проекта
+Общие GNOME, Firefox, Ghostty, Steam и GameMode; LibreOffice, Transmission,
+QEMU/KVM, libvirt, virt-manager, virt-viewer, swtpm, virtiofsd и SPICE USB.
+Включены firmware, microcode Intel, Bluetooth, libinput и профили питания.
+MOZA, NVIDIA и отдельный диск /games не подключены. Автовход не включён.
 
-Ранее обсуждалась установленная NixOS на Dell Latitude 3410, очистка стандартного GNOME и переход к flakes. Приняты общие предпочтения: тёмная тема, чёрный фон, Ghostty, Firefox, Papirus, Bibata, нижний скрывающийся Dock, русская раскладка. Steam для Dell планировался.
+## Первое применение
 
-Текущие CPU/GPU, UUID, разметка, состояние перехода на unstable и окончательный рабочий профиль не подтверждены актуальным кодом. Эти параметры нельзя брать с zet, nuc или VM.
+Сверьте UUID с `lsblk -f`. Для новой рабочей копии:
 
-## Что собрать на ноутбуке
+```bash
+git clone https://github.com/nikolaevmpf/gnome-config.git ~/gnome-config
+cd ~/gnome-config
+nix flake lock
+sudo nixos-rebuild boot --flake "path:$PWD#dell"
+```
 
-~~~bash
-hostnamectl
-nixos-version
-lspci -nnk
-lsblk -f
-findmnt -R /
-cat /etc/nixos/hardware-configuration.nix
-~~~
+Если репозиторий уже существует, выполните `git pull --ff-only` вместо клонирования.
+После успешной сборки:
 
-Также сохранить текущую конфигурацию и lock-файл, если используются flakes. Эти команды читают данные, не изменяют систему.
+```bash
+sudo reboot
+```
 
-## Как добавить профиль
+До первого применения не используйте nix-update: базовый hostname nixos выбирает vm.
+После перезагрузки проверьте:
 
-1. Создать hosts/dell с аппаратными настройками, точками монтирования, загрузчиком и собственными UUID.
-2. Подключить modules/common.nix и modules/gnome.nix.
-3. Подключить modules/gaming.nix, если сохраняется план Steam.
-4. Добавить nixosConfigurations.dell в flake.nix и согласовать networking.hostName с выбором профиля командой nix-update.
-5. Проверить touchpad, Wi-Fi, Bluetooth, звук, батарею, закрытие крышки и восстановление после сна.
-6. После успешного build применить через boot и сохранить старое поколение.
+```bash
+hostname
+systemctl --failed
+findmnt -t btrfs -o TARGET,SOURCE
+nmcli device status
+ls -l /dev/kvm
+virsh -c qemu:///system list --all
+```
 
-До выполнения этих шагов ноутбук управляется своей существующей конфигурацией. Здесь документирован план, а не готовая инструкция применения.
+Последующие обновления: `nix-update`, версии пакетов: `nix-update --upgrade`.
+В UEFI должна быть включена виртуализация Intel VT-x.
+Проверьте звук, Bluetooth, тачпад, яркость, батарею и восстановление после сна.
+Гибернация на дисковый swap не настроена; zram используется для обычного swap.
+Конфигурация не форматирует диск. Сборка и работа на ноутбуке требуют проверки.
